@@ -7,7 +7,7 @@
     "license": ["GPL 3", "LGPL 3"],
     "authors": [
         {
-            "name": "Roberto Machado",
+            "name": "Roberto L. Machado",
             "email": "roberto.machado@superig.com.br",
             "homepage": "http://www.nfephp.org",
             "role": "Developer"
@@ -29,11 +29,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
-        "ext-curl": "*"
-        "ext-soap": "*"
-        "ext-gd": "*"
-        "ext-mcrypt": "*"
+        "php": ">=5.3.0",
+        "ext-curl": "*",
+        "ext-soap": "*",
+        "ext-gd": "*",
+        "ext-mcrypt": "*",
         "ext-openssl": "*"
     },
     "autoload": {

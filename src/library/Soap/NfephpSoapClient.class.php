@@ -37,4 +37,4 @@ class NfephpSoapClient extends SoapClient
     }
     
 } //fim NfephpSoap
-?>
+

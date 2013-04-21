@@ -608,7 +608,7 @@ class NFePHP
     // CONSTANTES usadas no controle das exceções
     /////////////////////////////////////////////////
     const STOP_MESSAGE  = 0; // apenas um aviso, o processamento continua
-    const STOP_CONTINUE = 1; // quationamento ?, perecido com OK para continuar o processamento
+    const STOP_CONTINUE = 1; // questionamento ?, perecido com OK para continuar o processamento
     const STOP_CRITICAL = 2; // Erro critico, interrupção total
     
     /**
@@ -1321,7 +1321,7 @@ class NFePHP
             }
             if ($docxml == '') {
                 $msg = "Um xml deve ser passado para que seja assinado!!";
-                    throw new NfephpException($msg);
+                throw new NfephpException($msg);
             }
             if (is_file($docxml)) {
                 $xml = file_get_contents($docxml);

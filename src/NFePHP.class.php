@@ -1,8 +1,13 @@
 <?php
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * NFePHP (http://www.nfephp.org/)
+ *
+ * @link      http://github.com/nfephp-org/nfephp for the canonical source repository
+ * @copyright Copyright (c) 2008-2013 NFePHP (http://www.nfephp.org)
+ * @license   LGPL v3
+ * @license   GPL v3
+ * @package   NFePHP
  */
 
 namespace NFePHP;

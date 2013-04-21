@@ -5,8 +5,8 @@
  *
  * @link      http://github.com/nfephp-org/nfephp for the canonical source repository
  * @copyright Copyright (c) 2008-2013 NFePHP (http://www.nfephp.org)
- * @license   LGPL v3
- * @license   GPL v3
+ * @license   http://www.gnu.org/licenses/lesser.html LGPL v3
+ * @license   http://www.gnu.org/licenses/gpl.html GNU/GPL v.3
  * @package   NFePHP
  */
 
@@ -19,8 +19,6 @@ use NFePHP\Soap;
  * @package   NFePHP
  * @name      NFePHP
  * @version   4.0.0
- * @license   http://www.gnu.org/licenses/gpl.html GNU/GPL v.3
- * @copyright 2009-2012 &copy; NFePHP
  * @link      http://www.nfephp.org/
  * @author    Roberto L. Machado <linux.rlm at gmail dot com>
  */

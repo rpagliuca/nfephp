@@ -1295,9 +1295,7 @@ class NFePHP
             $nfeb2bXML = str_replace("\s", '', $nfeb2bXML);
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             return false;
         }
         return $nfeb2bXML;
@@ -2074,9 +2072,7 @@ class NFePHP
             } //fim retorno
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             return false;
         }//fim catch
         return $aRetorno; //mudar para $retorno
@@ -2239,9 +2235,7 @@ class NFePHP
             }
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             return false;
         }//fim catch
         $resp = array('NFe'=>$aNFe,'Canc'=>$aCanc,'CCe'=>$aCCe);
@@ -2788,6 +2782,7 @@ class NFePHP
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
             throw $e;
+            return false;
         }
         return $procXML;
     } //fim cancEvent
@@ -3217,9 +3212,7 @@ class NFePHP
             }
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             $resp = array('bStat'=>false,'cStat'=>$cStat,'xMotivo'=>$xMotivo,'arquivo'=>'');
             return false;
         }
@@ -3356,9 +3349,7 @@ class NFePHP
             //..... continua ainda falta bastante coisa
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             return false;
         }
         return $dados;
@@ -3733,9 +3724,7 @@ class NFePHP
             }
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             return false;
         }
         return true;
@@ -4386,9 +4375,7 @@ class NFePHP
             }//fim cStat ver=ver
         } catch (NfephpException $e) {
             $this->setError($e->getMessage());
-            if ($this->exceptions) {
-                throw $e;
-            }
+            throw $e;
             return false;
         }
         return true;

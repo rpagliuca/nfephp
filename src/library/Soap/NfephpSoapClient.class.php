@@ -33,7 +33,7 @@ class NfephpSoapClient extends SoapClient
         $request = str_replace('ns1:', '', $request);
         $request = str_replace("\n", '', $request);
         $request = str_replace("\r", '', $request);
-        return parent::__doRequest($request, $location, $action, $version);
+        return parent::__doRequest($request, $location, $action, $version,$one_way);
     }
     
 } //fim NfephpSoap

@@ -34,7 +34,8 @@
         "ext-soap": "*",
         "ext-gd": "*",
         "ext-mcrypt": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "apigen/apigen": ">=2.8.0"
     },
     "autoload": {
         "psr-0": {

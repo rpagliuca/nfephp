@@ -10,7 +10,7 @@
  * @package   NFePHP
  */
 
-namespace nfephp\Exception;
+namespace NFePHP\Exception;
 
 /**
  * Classe complementar 
@@ -22,7 +22,7 @@ namespace nfephp\Exception;
  * @name nfephpException
  * 
  */
-class nfephpException extends Exception
+class NfephpException extends Exception
 {
     
     public function __construct($message = null, $code = 0)
@@ -43,6 +43,4 @@ class nfephpException extends Exception
     {
         // fazer algum log aqui
     }
-
-} //fim da classe
-
+}

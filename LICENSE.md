@@ -5,7 +5,7 @@ Este programa é um software livre, você pode, redistribuir e/ou modificá-lo:
 
 sob os termos da **Licença Pública Geral Menor GNU (LGPL)** como é publicada pela Fundação para o Software Livre, na versão 3 da licença, ou qualquer versão posterior
 
-e/ou 
+ou 
 
 sob os termos da **Licença Pública Geral GNU (GPL)** como é publicada pela Fundação para o Software Livre, na versão 3 da licença, ou qualquer versão posterior.
 

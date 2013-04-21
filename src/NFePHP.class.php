@@ -1458,7 +1458,7 @@ class NFePHP
      * @name statusServico
      * @param	string $UF sigla da unidade da Federação
      * @param   integer $tpAmb tipo de ambiente 1-produção e 2-homologação
-     * @param   integer 1 usa o sendSOAP e 2 usa o sendSOAP2
+     * @param   integer 1 usa o sendSOAP e 2 usa o curlSOAP
      * @param  array $aRetorno parametro passado por referencia irá conter a resposta da consulta em um array
      * @return	mixed false ou array ['bStat'=>boolean,'cStat'=>107,'tMed'=>1,'dhRecbto'=>'12/12/2009','xMotivo'=>'Serviço em operação','xObs'=>'']
      */
@@ -1498,7 +1498,7 @@ class NFePHP
             //montagem dos dados da mensagem SOAP
             $dados = '<nfeDadosMsg xmlns="'. $namespace . '"><consStatServ xmlns="'.$this->URLPortal.'" versao="'.$versao.'"><tpAmb>'.$tpAmb.'</tpAmb><cUF>'.$cUF.'</cUF><xServ>STATUS</xServ></consStatServ></nfeDadosMsg>';
             if ($modSOAP == '2') {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
             }
@@ -1560,7 +1560,7 @@ class NFePHP
      * @param   string  $CNPJ opcional numero do cnpj
      * @param   string  $CPF opcional numero do cpf
      * @param   string  $tpAmb tipo de ambiente se não informado será usado o ambiente default
-     * @param   integer $modSOAP    1 usa sendSOAP e 2 usa sendSOAP2
+     * @param   integer $modSOAP    1 usa sendSOAP e 2 usa curlSOAP
      * @return	mixed false se falha ou array se retornada informação
      */
     public function consultaCadastro($UF, $CNPJ = '', $IE = '', $CPF = '', $tpAmb = '', $modSOAP = '2')
@@ -1637,7 +1637,7 @@ class NFePHP
         $dados = '<nfeDadosMsg xmlns="'. $namespace . '"><ConsCad xmlns="'.$this->URLnfe.'" versao="'.$versao.'"><infCons><xServ>CONS-CAD</xServ><UF>'.$UF.'</UF>'.$filtro.'</infCons></ConsCad></nfeDadosMsg>';
         //envia a solicitação via SOAP
         if ($modSOAP == 2) {
-            $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+            $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
         } else {
             $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
         }
@@ -1722,7 +1722,7 @@ class NFePHP
     } //fim consultaCadastro
 
     /**
-     * sendLot
+     * soapEnvLot
      * Envia lote de Notas Fiscais para a SEFAZ.
      * Este método pode enviar uma ou mais NFe para o SEFAZ, desde que,
      * o tamanho do arquivo de envio não ultrapasse 500kBytes
@@ -1732,11 +1732,11 @@ class NFePHP
      * @param	mixed    $mNFe string com uma nota fiscal em xml ou um array com as NFe em xml, uma em cada campo do array unidimensional MAX 50
      * @param   integer $idLote     id do lote e um numero que deve ser gerado pelo sistema
      *                          a cada envio mesmo que seja de apenas uma NFe
-     * @param   integer $modSOAP 1 usa sendSOP e 2 usa sendSOAP2
+     * @param   integer $modSOAP 1 usa sendSOP e 2 usa curlSOAP
      * @return	mixed	false ou array ['bStat'=>false,'cStat'=>'','xMotivo'=>'','dhRecbto'=>'','nRec'=>'','tMed'=>'','tpAmb'=>'','verAplic'=>'','cUF'=>'']
      * @todo Incluir regra de validação para ambiente de homologação/produção vide NT2011.002
      */
-    public function sendLot($mNFe, $idLote, $modSOAP = '2')
+    public function soapEnvLot($mNFe, $idLote, $modSOAP = '2')
     {
         //variavel de retorno do metodo
         $aRetorno = array('bStat'=>false,'cStat'=>'','xMotivo'=>'','dhRecbto'=>'','nRec'=>'','tMed'=>'','tpAmb'=>'','verAplic'=>'','cUF'=>'');
@@ -1780,7 +1780,7 @@ class NFePHP
         $dados = '<nfeDadosMsg xmlns="'.$namespace.'"><enviNFe xmlns="'.$this->URLPortal.'" versao="'.$versao.'"><idLote>'.$idLote.'</idLote>'.$sNFe.'</enviNFe></nfeDadosMsg>';
         //envia dados via SOAP
         if ($modSOAP == '2') {
-            $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb);
+            $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb);
         } else {
             $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb, $this->UF);
         }
@@ -1839,11 +1839,11 @@ class NFePHP
      * @param	string   $recibo numero do recibo do envio do lote
      * @param	string   $chave  numero da chave da NFe de 44 digitos
      * @param   string   $tpAmb  numero do ambiente 1-producao e 2-homologação
-     * @param   integer  $modSOAP 1 usa sendSOAP e 2 usa sendSOAP2
+     * @param   integer  $modSOAP 1 usa sendSOAP e 2 usa curlSOAP
      * @param   array    $aRetorno Array com os dados do protocolo 
      * @return	mixed    false ou xml 
      */
-    public function getProtocol($recibo = '', $chave = '', $tpAmb = '', $modSOAP = '2', &$aRetorno = '')
+    public function soapGetProtocol($recibo = '', $chave = '', $tpAmb = '', $modSOAP = '2', &$aRetorno = '')
     {
         try {
             //carrega defaults
@@ -1924,7 +1924,7 @@ class NFePHP
             }
             //envia a solicitação via SOAP
             if ($modSOAP == 2) {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
             }
@@ -2095,7 +2095,7 @@ class NFePHP
      * @param array $resp Array com os retornos parametro passado por REFRENCIA
      * @return mixed False ou xml com os dados
      */
-    public function getListNFe($AN = false, $indNFe = '0', $indEmi = '0', $ultNSU = '', $tpAmb = '', $modSOAP = '2', &$resp = '')
+    public function soapGetListNFe($AN = false, $indNFe = '0', $indEmi = '0', $ultNSU = '', $tpAmb = '', $modSOAP = '2', &$resp = '')
     {
         try {
             $datahora = date('Ymd_His');
@@ -2142,7 +2142,7 @@ class NFePHP
             }
             //envia dados via SOAP
             if ($modSOAP == '2') {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
@@ -2262,7 +2262,7 @@ class NFePHP
      * TODO: quando o serviço estiver funcional extrair o xml da NFe e colocar
      * no diretorio correto
      */
-    public function getNFe($AN = true, $chNFe = '', $tpAmb = '', $modSOAP = '2')
+    public function soapGetNFe($AN = true, $chNFe = '', $tpAmb = '', $modSOAP = '2')
     {
         try {
             if ($chNFe == '') {
@@ -2302,7 +2302,7 @@ class NFePHP
             $dados = '<nfeDadosMsg xmlns="'.$namespace.'"><downloadNFe xmlns="'.$this->URLPortal.'" versao="'.$versao.'"><tpAmb>'.$tpAmb.'</tpAmb><xServ>DOWNLOAD NFE</xServ><CNPJ>'.$this->cnpj.'</CNPJ><chNFe>'.$chNFe.'</chNFe></downloadNFe></nfeDadosMsg>';
             //envia dados via SOAP
             if ($modSOAP == '2') {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
@@ -2387,10 +2387,10 @@ class NFePHP
      * @param   integer $nFin       numero Final 1 até 9 digitos zero a esq
      * @param   string  $xJust      justificativa 15 até 255 digitos
      * @param   string  $tpAmb      Tipo de ambiente 1-produção ou 2 homologação
-     * @param   integer $modSOAP    1 usa sendSOAP e 2 usa sendSOAP2
+     * @param   integer $modSOAP    1 usa sendSOAP e 2 usa curlSOAP
      * @return	mixed false ou string com o xml do processo de inutilização
      */
-    public function inutNF($nAno = '', $nSerie = '1', $nIni = '', $nFin = '', $xJust = '', $tpAmb = '', $modSOAP = '2')
+    public function soapInutNF($nAno = '', $nSerie = '1', $nIni = '', $nFin = '', $xJust = '', $tpAmb = '', $modSOAP = '2')
     {
         //valida dos dados de entrada
         if ($nAno == '' || $nIni == '' || $nFin == '' || $xJust == '') {
@@ -2505,7 +2505,7 @@ class NFePHP
         }
         //envia a solicitação via SOAP
         if ($modSOAP == '2') {
-            $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb);
+            $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb);
         } else {
             $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb, $this->UF);
         }
@@ -2594,7 +2594,7 @@ class NFePHP
      * @param number $tpAmb
      * @param number $modSOAP
      */
-    public function cancelEvent($chNFe = '', $nProt = '', $xJust = '', $tpAmb = '', $modSOAP = '2')
+    public function soapCancelEvent($chNFe = '', $nProt = '', $xJust = '', $tpAmb = '', $modSOAP = '2')
     {
         try {
             //validação dos dados de entrada
@@ -2703,7 +2703,7 @@ class NFePHP
             }
             //envia dados via SOAP
             if ($modSOAP == '2') {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
@@ -2801,10 +2801,10 @@ class NFePHP
      *                             O Web Service não permite a duplicidade de numeração 
      *                             e nem controla a ordem crescente
      * @param   integer $tpAmb Tipo de ambiente 
-     * @param   integer $modSOAP 1 usa sendSOP e 2 usa sendSOAP2
+     * @param   integer $modSOAP 1 usa sendSOP e 2 usa curlSOAP
      * @return	mixed false ou xml com a CCe
      */
-    public function envCCe($chNFe = '', $xCorrecao = '', $nSeqEvento = '1', $tpAmb = '', $modSOAP = '2')
+    public function soapEnvCCe($chNFe = '', $xCorrecao = '', $nSeqEvento = '1', $tpAmb = '', $modSOAP = '2')
     {
         try {
             //testa se os dados da carta de correção foram passados
@@ -2913,7 +2913,7 @@ class NFePHP
             }
             //envia dados via SOAP
             if ($modSOAP == '2') {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
@@ -3004,13 +3004,13 @@ class NFePHP
      * @param   string $tpEvento Tipo do evento pode conter 2 ou 6 digitos ex. 00 ou 210200
      * @param   string $xJust Justificativa quando tpEvento = 40 ou 210240
      * @param   integer $tpAmb Tipo de ambiente 
-     * @param   integer $modSOAP 1 usa sendSOP e 2 usa sendSOAP2
+     * @param   integer $modSOAP 1 usa sendSOP e 2 usa curlSOAP
      * @param   mixed  $resp variável passada como referencia e irá conter o retorno da função em um array
      * @return	mixed false 
      * 
      * TODO : terminar o código não funcional e não testado
      */
-    public function manifDest($chNFe = '', $tpEvento = '', $xJust = '', $tpAmb = '', $modSOAP = '2', &$resp = '')
+    public function soapManifDest($chNFe = '', $tpEvento = '', $xJust = '', $tpAmb = '', $modSOAP = '2', &$resp = '')
     {
         try {
             if ($chNFe == '') {
@@ -3129,7 +3129,7 @@ class NFePHP
             }
             //envia dados via SOAP
             if ($modSOAP == '2') {
-                $retorno = $this->sendSOAP2($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
                 $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
@@ -3224,7 +3224,7 @@ class NFePHP
      * Apenas para teste não funcional
      *
      */
-    public function envDPEC($aNFe = '', $tpAmb = '', $modSOAP = '2')
+    public function soapEnvDPEC($aNFe = '', $tpAmb = '', $modSOAP = '2')
     {
         // Habilita a manipulaçao de erros da libxml
         libxml_use_internal_errors(true);
@@ -4017,12 +4017,12 @@ class NFePHP
     } //fim sendSOAP
 
     /**
-     * sendSOAP2
+     * curlSOAP
      * Função alternativa para estabelecer comunicaçao com servidor SOAP 1.2 da SEFAZ,
      * usando as chaves publica e privada parametrizadas na contrução da classe.
      * Conforme Manual de Integração Versão 4.0.1 Utilizando cURL e não o SOAP nativo
      *
-     * @name sendSOAP2
+     * @name curlSOAP
      * @param string $urlsefaz
      * @param string $namespace
      * @param string $cabecalho
@@ -4032,7 +4032,7 @@ class NFePHP
      * @param string $UF sem uso mantido apenas para compatibilidade com sendSOAP
      * @return mixed false se houve falha ou o retorno em xml do SEFAZ
      */
-    protected function sendSOAP2($urlsefaz, $namespace, $cabecalho, $dados, $metodo, $ambiente = '', $UF = '')
+    protected function curlSOAP($urlsefaz, $namespace, $cabecalho, $dados, $metodo, $ambiente = '', $UF = '')
     {
         try {
             if ($urlsefaz == '') {
@@ -4179,7 +4179,7 @@ class NFePHP
             throw $e;
             return false;
         }
-    } //fim sendSOAP2
+    } //fim curlSOAP
 
     /**
      * getNumLot

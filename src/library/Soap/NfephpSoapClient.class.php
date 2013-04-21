@@ -27,7 +27,7 @@ namespace nfephp\soap;
 class NfephpSoapClient extends SoapClient
 {
     
-    public function __doRequest($request, $location, $action, $version,$one_way = 0)
+    public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
         $request = str_replace(':ns1', '', $request);
         $request = str_replace('ns1:', '', $request);

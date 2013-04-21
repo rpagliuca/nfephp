@@ -1446,7 +1446,7 @@ class NFePHP
     } //fim signXML
 
     /**
-     * statusServico
+     * soapStatusService
      * Verifica o status do servico da SEFAZ
      *
      * $this->cStat = 107 OK
@@ -1455,14 +1455,14 @@ class NFePHP
      *        cStat = 113 SCAN operando mas irá parar use o serviço Normal
      *        cStat = 114 SCAN dasativado pela SEFAZ de origem    
      * se SCAN estiver ativado usar, caso contrario aguardar pacientemente.
-     * @name statusServico
+     * @name soapStatusService
      * @param	string $UF sigla da unidade da Federação
      * @param   integer $tpAmb tipo de ambiente 1-produção e 2-homologação
-     * @param   integer 1 usa o sendSOAP e 2 usa o curlSOAP
+     * @param   integer 1 usa o nfeSOAP e 2 usa o curlSOAP
      * @param  array $aRetorno parametro passado por referencia irá conter a resposta da consulta em um array
      * @return	mixed false ou array ['bStat'=>boolean,'cStat'=>107,'tMed'=>1,'dhRecbto'=>'12/12/2009','xMotivo'=>'Serviço em operação','xObs'=>'']
      */
-    public function statusServico($UF = '', $tpAmb = '', $modSOAP = '2', &$aRetorno = '')
+    public function soapStatusService($UF = '', $tpAmb = '', $modSOAP = '2', &$aRetorno = '')
     {
         try {
             //retorno da funçao
@@ -1500,7 +1500,7 @@ class NFePHP
             if ($modSOAP == '2') {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
             }
             //verifica o retorno do SOAP
             if ($retorno) {
@@ -1549,21 +1549,21 @@ class NFePHP
     } //fim statusServico
 
     /**
-     * consultaCadastro
+     * soapConsCad
      * Solicita dados de situaçao de Cadastro, somente funciona para
      * cadastros de empresas localizadas no mesmo estado do solicitante e os dados
      * retornados podem ser bastante incompletos. Não é recomendado seu uso.
      *
-     * @name consultaCadastro
+     * @name soapConsCad
      * @param	string  $UF sigla da unidade da federação
      * @param   string  $IE opcional numero da inscrição estadual
      * @param   string  $CNPJ opcional numero do cnpj
      * @param   string  $CPF opcional numero do cpf
      * @param   string  $tpAmb tipo de ambiente se não informado será usado o ambiente default
-     * @param   integer $modSOAP    1 usa sendSOAP e 2 usa curlSOAP
+     * @param   integer $modSOAP    1 usa nfeSOAP e 2 usa curlSOAP
      * @return	mixed false se falha ou array se retornada informação
      */
-    public function consultaCadastro($UF, $CNPJ = '', $IE = '', $CPF = '', $tpAmb = '', $modSOAP = '2')
+    public function soapConsCad($UF, $CNPJ = '', $IE = '', $CPF = '', $tpAmb = '', $modSOAP = '2')
     {
         //variavel de retorno do metodo
         $aRetorno = array('bStat'=>false,'cStat'=>'','xMotivo'=>'','dados'=>array());
@@ -1639,7 +1639,7 @@ class NFePHP
         if ($modSOAP == 2) {
             $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
         } else {
-            $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
+            $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
         }
         //verifica o retorno
         if (!$retorno) {
@@ -1669,7 +1669,7 @@ class NFePHP
         }
         //tratar erro 239 Versão do arquivo XML não suportada
         if ($cStat == '239') {
-            $this->trata239($retorno, $this->UF, $tpAmb, $servico, $versao);
+            $this->solveVersionErr($retorno, $this->UF, $tpAmb, $servico, $versao);
             $msg = "Versão do arquivo XML não suportada!!";
             $this->setError($msg);
             if ($this->exceptions) {
@@ -1782,7 +1782,7 @@ class NFePHP
         if ($modSOAP == '2') {
             $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb);
         } else {
-            $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb, $this->UF);
+            $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb, $this->UF);
         }
         //verifica o retorno
         if ($retorno) {
@@ -1839,7 +1839,7 @@ class NFePHP
      * @param	string   $recibo numero do recibo do envio do lote
      * @param	string   $chave  numero da chave da NFe de 44 digitos
      * @param   string   $tpAmb  numero do ambiente 1-producao e 2-homologação
-     * @param   integer  $modSOAP 1 usa sendSOAP e 2 usa curlSOAP
+     * @param   integer  $modSOAP 1 usa nfeSOAP e 2 usa curlSOAP
      * @param   array    $aRetorno Array com os dados do protocolo 
      * @return	mixed    false ou xml 
      */
@@ -1926,7 +1926,7 @@ class NFePHP
             if ($modSOAP == 2) {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
             }
             //verifica o retorno
             if ($retorno) {
@@ -2144,7 +2144,7 @@ class NFePHP
             if ($modSOAP == '2') {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
             //verifica o retorno
             if (!$retorno) {
@@ -2304,7 +2304,7 @@ class NFePHP
             if ($modSOAP == '2') {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
             //verifica o retorno
             if (!$retorno) {
@@ -2387,7 +2387,7 @@ class NFePHP
      * @param   integer $nFin       numero Final 1 até 9 digitos zero a esq
      * @param   string  $xJust      justificativa 15 até 255 digitos
      * @param   string  $tpAmb      Tipo de ambiente 1-produção ou 2 homologação
-     * @param   integer $modSOAP    1 usa sendSOAP e 2 usa curlSOAP
+     * @param   integer $modSOAP    1 usa nfeSOAP e 2 usa curlSOAP
      * @return	mixed false ou string com o xml do processo de inutilização
      */
     public function soapInutNF($nAno = '', $nSerie = '1', $nIni = '', $nFin = '', $xJust = '', $tpAmb = '', $modSOAP = '2')
@@ -2507,7 +2507,7 @@ class NFePHP
         if ($modSOAP == '2') {
             $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb);
         } else {
-            $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb, $this->UF);
+            $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $this->tpAmb, $this->UF);
         }
         //verifica o retorno
         if (!$retorno) {
@@ -2705,7 +2705,7 @@ class NFePHP
             if ($modSOAP == '2') {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
             //verifica o retorno
             if (!$retorno) {
@@ -2728,7 +2728,7 @@ class NFePHP
             }
             //tratar erro de versão do XML
             if ($cStat == '238' || $cStat == '239') {
-                $this->trata239($retorno, $this->UF, $tpAmb, $servico, $versao);
+                $this->solveVersionErr($retorno, $this->UF, $tpAmb, $servico, $versao);
                 $msg = "Versão do arquivo XML não suportada no webservice!!";
                 throw new NfephpException($msg);
             }
@@ -2915,7 +2915,7 @@ class NFePHP
             if ($modSOAP == '2') {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
             //verifica o retorno
             if (!$retorno) {
@@ -3131,7 +3131,7 @@ class NFePHP
             if ($modSOAP == '2') {
                 $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
-                $retorno = $this->sendSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
+                $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $this->UF);
             }
             //verifica o retorno
             if (!$retorno) {
@@ -3155,7 +3155,7 @@ class NFePHP
             }
             //tratar erro de versão do XML
             if ($cStat == '238' || $cStat == '239') {
-                $this->trata239($retorno, $sigla, $tpAmb, $servico, $versao);
+                $this->solveVersionErr($retorno, $sigla, $tpAmb, $servico, $versao);
                 $msg = "Versão do arquivo XML não suportada no webservice!!";
                 throw new NfephpException($msg);
             }
@@ -3457,7 +3457,7 @@ class NFePHP
                 $nProt = '';
             }
             //busca o status da NFe na SEFAZ do estado do emitente
-            $resp = $this->getProtocol('', $chave, $tpAmb);
+            $resp = $this->soapGetProtocol('', $chave, $tpAmb);
             if ($resp['cStat']!='100') {
                 $msg = "NF não aprovada no SEFAZ!! cStat =" . $resp['cStat'] .' - '.$resp['xMotivo'] ."";
                 throw new NfephpException($msg);
@@ -3898,12 +3898,12 @@ class NFePHP
     } //fim listDir
 
     /**
-     * sendSOAP
+     * nfeSOAP
      * Estabelece comunicaçao com servidor SOAP 1.1 ou 1.2 da SEFAZ,
      * usando as chaves publica e privada parametrizadas na contrução da classe.
      * Conforme Manual de Integração Versão 4.0.1 
      *
-     * @name sendSOAP
+     * @name nfeSOAP
      * @param string $urlsefaz
      * @param string $namespace
      * @param string $cabecalho
@@ -3913,7 +3913,7 @@ class NFePHP
      * @param string $UF unidade da federação, necessário para diferenciar AM, MT e PR
      * @return mixed false se houve falha ou o retorno em xml do SEFAZ
      */
-    protected function sendSOAP($urlsefaz, $namespace, $cabecalho, $dados, $metodo, $ambiente, $UF = '')
+    protected function nfeSOAP($urlsefaz, $namespace, $cabecalho, $dados, $metodo, $ambiente, $UF = '')
     {
         try {
             if (!class_exists("SoapClient")) {
@@ -4014,7 +4014,7 @@ class NFePHP
             return false;
         }
         return $resposta;
-    } //fim sendSOAP
+    } //fim nfeSOAP
 
     /**
      * curlSOAP
@@ -4029,7 +4029,7 @@ class NFePHP
      * @param string $dados
      * @param string $metodo
      * @param numeric $ambiente
-     * @param string $UF sem uso mantido apenas para compatibilidade com sendSOAP
+     * @param string $UF sem uso mantido apenas para compatibilidade com nfeSOAP
      * @return mixed false se houve falha ou o retorno em xml do SEFAZ
      */
     protected function curlSOAP($urlsefaz, $namespace, $cabecalho, $dados, $metodo, $ambiente = '', $UF = '')
@@ -4304,18 +4304,18 @@ class NFePHP
     }//fim putUltNSU
     
     /**
-     * trata239
+     * solveVersionErr
      * Esta função corrige automaticamente todas as versões dos 
      * webservices sempre que ocorrer o erro 238 ou 239
      * no retorno de qualquer requisição aos webservices
      * 
-     * @name trata239
+     * @name solveVersionErr
      * @param string $xml xml retornado da SEFAZ
      * @param string $UF sigla do estado
      * @param numeric $tpAmb tipo do ambiente
      * @param string $metodo método
      */
-    private function trata239($xml = '', $UF = '', $tpAmb = '', $servico = '', $versaodefault = '')
+    private function solveVersionErr($xml = '', $UF = '', $tpAmb = '', $servico = '', $versaodefault = '')
     {
         //quando ocorre esse erro o que está errado é a versão indicada no arquivo nfe_ws2.xml
         // para esse método, então nos resta ler o retorno pegar o numero correto da versão,

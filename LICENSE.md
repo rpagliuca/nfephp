@@ -1,3 +1,7 @@
+NFePHP
+======
+Copyright (c) 2008-2013 - Roberto L. Machado linux dot rlm at gmail dot com 
+
 LICENÇAS
 =========
 

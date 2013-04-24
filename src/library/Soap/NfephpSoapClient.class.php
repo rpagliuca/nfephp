@@ -10,7 +10,7 @@
  * @package   NFePHP
  */
 
-namespace NFePHP\soap;
+namespace NFePHP\Soap;
 
 /**
  * 

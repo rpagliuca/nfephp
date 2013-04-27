@@ -595,6 +595,11 @@ class NFePHP
      */
     public function __construct($aConfig = '', $mododebug = 2)
     {
+        
+        $this->raizDir = dirname(__DIR__). DIRECTORY_SEPARATOR .  'NFePHP' . DIRECTORY_SEPARATOR;
+        $this->certsDir = dirname(__DIR__). DIRECTORY_SEPARATOR .  'certs' . DIRECTORY_SEPARATOR;
+        $this->imgDir = dirname(__DIR__). DIRECTORY_SEPARATOR .  'images' . DIRECTORY_SEPARATOR;
+        
         if (is_numeric($mododebug)) {
             $this->debugMode = $mododebug;
         }
@@ -608,8 +613,6 @@ class NFePHP
             error_reporting(0);
             ini_set('display_errors', 'Off');
         }
-        //obtem o path da biblioteca
-        $this->raizDir = '../' . dirname(dirname(FILE)) . DIRECTORY_SEPARATOR;
         //verifica se foi passado uma matriz de configuração na inicialização da classe
         if (is_array($aConfig)) {
             $this->tpAmb=$aConfig['ambiente'];
@@ -638,10 +641,11 @@ class NFePHP
                 $this->aMail = array('mailFROM'=>$aConfig['mailFROM'],'mailHOST'=>$aConfig['mailHOST'],'mailUSER'=>$aConfig['mailUSER'],'mailPASS'=>$aConfig['mailPASS'],'mailPROTOCOL'=>$aConfig['mailPROTOCOL'],'mailFROMmail'=>$aConfig['mailFROMmail'],'mailFROMname'=>$aConfig['mailFROMname'],'mailREPLYTOmail'=>$aConfig['mailREPLYTOmail'],'mailREPLYTOname'=>$aConfig['mailREPLYTOname']);
             }
         } else {
+            
             //testa a existencia do arquivo de configuração
-            if (is_file($this->raizDir . 'config' . DIRECTORY_SEPARATOR . 'config.php')) {
+            if (is_file($this->raizDir.'config.php')) {
                 //carrega o arquivo de configuração
-                include($this->raizDir . 'config' . DIRECTORY_SEPARATOR . 'config.php');
+                include($this->raizDir.'config.php');
                 // carrega propriedades da classe com os dados de configuração
                 // a sring $sAmb será utilizada para a construção dos diretorios
                 // dos arquivos de operação do sistema
@@ -674,7 +678,6 @@ class NFePHP
             } else {
                 // caso não exista arquivo de configuração retorna erro
                 $msg = "Não foi localizado o arquivo de configuração.\n";
-                $this->setError($msg);
                 if ($this->exceptions) {
                     throw new NfephpException($msg);
                 }
@@ -687,10 +690,6 @@ class NFePHP
         $this->anoMes = date('Ym');
         //carrega o caminho para os schemas
         $this->xsdDir = $this->raizDir . 'schemes'. DIRECTORY_SEPARATOR;
-        //carrega o caminho para os certificados
-        $this->certsDir =  $this->raizDir . 'certs'. DIRECTORY_SEPARATOR;
-        //carrega o caminho para as imegens
-        $this->imgDir =  $this->raizDir . 'images'. DIRECTORY_SEPARATOR;
         //verifica o ultimo caracter da variável $arqDir
         // se não for um DIRECTORY_SEPARATOR então colocar um
         if (substr($this->arqDir, -1, 1) != DIRECTORY_SEPARATOR) {
@@ -774,12 +773,15 @@ class NFePHP
         }
         //carregar uma matriz com os dados para acesso aos WebServices SEFAZ
         $this->aURL = $this->loadSEFAZ(
-            $this->raizDir . 'config'. DIRECTORY_SEPARATOR . $this->xmlURLfile,
+            $this->raizDir . $this->xmlURLfile,
             $this->tpAmb,
             $this->UF
         );
+        
+        $pk = new \library\Pkcs12\Pkcs12Certs($this->certsDir, $this->certName, $this->keyPass, $this->cnpj, true);
+        
         //se houver erro no carregamento dos certificados passe para erro
-        if (!$retorno = $this->loadCerts()) {
+        if (!$retorno = $pk->loadCerts()) {
             $msg = "Erro no carregamento dos certificados.";
             throw new NfephpException($msg);
         }
@@ -1111,8 +1113,10 @@ class NFePHP
             //montagem dos dados da mensagem SOAP
             $dados = '<nfeDadosMsg xmlns="'. $namespace . '"><consStatServ xmlns="'.$this->URLPortal.'" versao="'.$versao.'"><tpAmb>'.$tpAmb.'</tpAmb><cUF>'.$cUF.'</cUF><xServ>STATUS</xServ></consStatServ></nfeDadosMsg>';
             if ($modSOAP == '2') {
-                $retorno = $this->curlSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
+                $oSoap = new \library\Soap\CurlSoap($this->priKEY, $this->pubKEY, $this->timeout);
+                $retorno = $oSoap->send($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb);
             } else {
+                $oSoap = new \library\Soap\NatSoap($this->pubKEY, $this->priKEY, $this->certKEY, $pathWsdl, $thid->timeout);
                 $retorno = $this->nfeSOAP($urlservico, $namespace, $cabec, $dados, $metodo, $tpAmb, $UF);
             }
             //verifica o retorno do SOAP
@@ -3380,5 +3384,116 @@ class NFePHP
             }   
         }
     }//fim downLoadWsdl
+    
+    public function typeXml()
+    {        
+        $xmlfile = file_get_contents($filename);
+        $xml = simplexml_load_string($xmlfile);
+        $tagroot = $xml->getName();
+        switch ($tagroot){
+            case 'NFe':
+                //NFe sem protocolo
+                break;
+            case 'nfeProc':
+                //NFe com o protocolo
+                break;
+            case 'CTe':
+                //CTe sem protocolo
+                break;
+            case 'cteProc':
+                //CTe com o protocolo
+                break;
+            case 'evento':
+                //evento sem o protocolo
+                break;
+            case 'envEvento':
+                //Envio de evento 
+                break;
+            case 'retEnvEvento':
+                //Retorno de evento
+                break;
+            case 'procEventoNFe':
+                //Evento com o protocolo
+                break;
+            case 'ConsCad':
+                //consulta de cadastro
+                break;
+            case 'consReciNFe':
+                //consulta recibo
+                break;
+            case 'retConsReciNFe':
+                //retorno da consulta do recibo
+                break;
+            case 'cancNFe':
+                //solicitação de cancelamento - DEPRECATE
+                break;
+            case 'retCancNFe':
+                //retorno da solicitação de cancelamento - DEPRECATE
+                break;
+            case 'inutNFe':
+                //solicitação de inutilização
+                break;
+            case 'retInutNFe':
+                //retorno da solicitação de inutilização
+                break;
+            case 'consSitNFe':
+                //consulta da situação da NFe
+                break;
+            case 'retConsSitNFe':
+                //retorno da consulta da situação da NFe
+                break;
+            case 'consStatServ':
+                //consulta do status do serviço
+                break;
+            case 'retConsStatServ':
+                //retorno da consulta do status do serviço 
+                break;
+        }
+    }//fim tipo xml
 
+    public function findXsd($xml)
+    {
+        //pegar o elemento
+        //pegar a versão
+        
+        $aXSD = array(
+            'cancNFe'=>'cancNFe_v',
+            'CCe' => 'CCe_v',
+            '' => 'confRecebto_v',
+            '' => 'consCad_v',
+            '' => 'consNFeDest_v',
+            '' => 'consReciNFe_v',
+            '' => 'consSitNFe_v',
+            '' => 'consSitNFe_v',
+            '' => 'consStatServ_v',
+            '' => 'downloadNFe_v',
+            '' => 'envCCe_v',
+            '' => 'envConfRecebto_v',
+            '' => 'envEvento_v',
+            '' => 'enviNFe_v',
+            '' => 'inutNFe_v',
+            '' => 'nfe_v',
+            '' => 'procCancNFe_v',
+            '' => 'procCCeNFe_v',
+            '' => 'procConfRecebtoNFe_v',
+            '' => 'procEventoNFe_v',
+            '' => 'procInutNFe_v',
+            '' => 'procNFe_v',
+            '' => 'retCancNFe_v',
+            '' => 'retConsCad_v',
+            '' => 'retconsNFeDest_v',
+            '' => 'retConsReciNFe_v',
+            '' => 'retConsSitNFe_v',
+            '' => 'retConsSitNFe_v',
+            '' => 'retConsStatServ_v',
+            '' => 'retDownloadNFe_v',
+            '' => 'retEnvCCe_v',
+            '' => 'retEnvConfRecebto_v',
+            '' => 'retEnvEvento_v',
+            '' => 'retEnviNFe_v',
+            '' => 'retInutNFe_v'
+        );
+          
+         
+    }        
 }

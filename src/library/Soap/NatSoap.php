@@ -9,26 +9,40 @@ namespace library\Soap;
 
 use library\Soap\CorrectedSoapClient;
 use library\Exception\NfephpException;
+use LSS\XML2Array;
 
 class NatSoap
 {
 
     public $soapDebug = '';
     public $soapTimeout = 10;
-    public $soapDebug = '';
     public $aError = array();
     public $pathWsdl = '';
    
     private $certKEY;
+    private $pubKEY;
+    private $priKEY;
+    
     private $proxyIP = '';
     private $proxyPORT = '';
     private $proxyUSER = '';
     private $proxyPASS = '';
     
-    public function __construct($certKey = '', $pathWsdl = '', $timeout = 10)
+    /**
+     * 
+     * @param type $publicKey
+     * @param type $privateKey
+     * @param type $certificateKey
+     * @param type $pathWsdl
+     * @param type $timeout
+     * @return boolean
+     * @throws \library\Exception\NfephpException
+     * @throws NfephpException
+     */
+    public function __construct($publicKey = '', $privateKey = '', $certificateKey = '', $pathWsdl = '', $timeout = 10)
     {
         try {
-            if ($certKey == '') {
+            if ($certificateKey == '' || $privateKey = '' || $publicKey == '') {
                 $msg = 'O path para as chaves deve ser passado na instânciação da classe.';
                 throw new NfephpException($msg);
             }
@@ -36,9 +50,10 @@ class NatSoap
                 $msg = 'O path para os arquivos WSDL deve ser passado na instânciação da classe.';
                 throw new NfephpException($msg);
             }
-            
-            $this->certKEY = $certKey;
-            $this->pathWsdl = $patWsdl;
+            $this->pubKEY = $publicKey;
+            $this->priKEY = $privateKey;
+            $this->certKEY = $certificateKey;
+            $this->pathWsdl = $pathWsdl;
             $this->soapTimeout = $timeout;
             
         } catch (NfephpException $e) {
@@ -64,7 +79,7 @@ class NatSoap
      * @param string $UF unidade da federação, necessário para diferenciar AM, MT e PR
      * @return mixed false se houve falha ou o retorno em xml do SEFAZ
      */
-    public function send($urlsefaz = '', $namespace = '', $cabecalho = '', $dados = '', $metodo = '', $ambiente = '2', $UF = '')
+    public function send($UF = '', $SVAN = false, $SCAN = false, $namespace = '', $cabecalho = '', $dados = '', $metodo = '', $ambiente = '2' )
     {
         try {
             if (!class_exists("SoapClient")) {
@@ -80,42 +95,16 @@ class NatSoap
             } else {
                 $ambiente = 'homologacao';
             }
-            //monta a terminação do URL
-            switch ($metodo){
-                case 'nfeRecepcaoLote2':
-                    $usef = "_NFeRecepcao2.asmx";
-                    break;
-                case 'nfeRetRecepcao2':
-                    $usef = "_NFeRetRecepcao2.asmx";
-                    break;
-                case 'nfeCancelamentoNF2':
-                    $usef = "_NFeCancelamento2.asmx";
-                    break;
-                case 'nfeInutilizacaoNF2':
-                    $usef = "_NFeInutilizacao2.asmx";
-                    break;
-                case 'nfeConsultaNF2':
-                    $usef = "_NFeConsulta2.asmx";
-                    break;
-                case 'nfeStatusServicoNF2':
-                    $usef = "_NFeStatusServico2.asmx";
-                    break;
-                case 'consultaCadastro':
-                    $usef = "";
-                    break;
-            }
-            //para os estados de AM, MT e PR é necessário usar wsdl baixado para acesso ao webservice
-            if ($UF=='AM' || $UF=='MT' || $UF=='PR') {
-                $urlsefaz = "$this->pathWsdl/$ambiente/$UF$usef";
-            }
+            $usef = "_$metodo.asmx";
+            $urlsefaz = "$this->pathWsdl/$ambiente/$UF$usef";
             if ($this->enableSVAN) {
                 //se for SVAN montar o URL baseado no metodo e ambiente
-                $urlsefaz = "$this->URLbase/wsdl/2.00/$ambiente/SVAN$usef";
+                $urlsefaz = "$this->pathWsdl/$ambiente/SVAN$usef";
             }
             //verificar se SCAN ou SVAN
             if ($this->enableSCAN) {
                 //se for SCAN montar o URL baseado no metodo e ambiente
-                $urlsefaz = "$this->URLbase/wsdl/2.00/$ambiente/SCAN$usef";
+                $urlsefaz = "$this->pathWsdl/$ambiente/SCAN$usef";
             }
             if ($this->soapTimeout == 0) {
                 $tout = 999999;
@@ -160,11 +149,129 @@ class NatSoap
             $this->soapDebug .= "\n" . $oSoapClient->getLastResponseHeaders();
             $this->soapDebug .= "\n" . $oSoapClient->getLastResponse();
         } catch (NfephpException $e) {
-            $this->setError($e->getMessage());
+            //$this->setError($e->getMessage());
             throw $e;
             return false;
         }
         return $resposta;
     } //fim nfeSOAP
+    
+    /**
+     * 
+     * @param type $ufsigla
+     * @param type $wsfile
+     */
+    public function downloadWsdl($ufsigla = '', $wsfile = '')
+    {
+        if ($wsfile == ''){
+            
+        }
+        
+        if ($ufsigla != '') {
+            
+        }
+        $pubKey = $this->pubKEY;
+        $priKey = $this->priKEY;
+        
+        //carrega o conteudo da lista de webservices
+        $xml = file_get_contents($wsfile);
+        //converte o xml em array
+        //$xml2a = new XML2Array();
+        
+        $ws = XML2Array::createArray($xml);
+        
+        //para cada UF
+        foreach($ws['WS']['UF'] as $uf){
+            $sigla = $uf['sigla'];
+            if ($ufsigla != '') {
+                if ($sigla == $ufsigla) {
+                    $ambiente = array('homologacao','producao');
+                    //para cada ambiente
+                    foreach($ambiente as $amb){
+                        $h = $uf[$amb];
+                        if (isset($h)){
+                            foreach($h as $k => $j){
+                                $nome = $k;
+                                $url=$j['@value'];
+                                $metodo=$j['@attributes']['method'];
+                                $versao = $j['@attributes']['version'];
+                                if ($url != ''){
+                                    $aS[] = $sigla;
+                                    $aA[] = $amb;
+                                    $aN[] = $nome;
+                                    $aU[] = $url.'?wsdl';
+                                    $aM[] = $metodo;
+                                    $aV[] = $versao;
+                                }    
+                            }
+                        }
+                    }
+                }
+            } else {
+                $ambiente = array('homologacao','producao');
+                //para cada ambiente
+                foreach($ambiente as $amb){
+                    $h = $uf[$amb];
+                    if (isset($h)){
+                        foreach($h as $k => $j){
+                            $nome = $k;
+                            $url=$j['@value'];
+                            $metodo=$j['@attributes']['method'];
+                            $versao = $j['@attributes']['version'];
+                            if ($url != ''){
+                                $aS[] = $sigla;
+                                $aA[] = $amb;
+                                $aN[] = $nome;
+                                $aU[] = $url.'?wsdl';
+                                $aM[] = $metodo;
+                                $aV[] = $versao;
+                            }    
+                        }
+                    }
+                }
+            }    
+        }//fim foreach
+        
+        //inicia o loop para baixar os arquivos wsdl
+        $i = 0;
+        foreach($aS as $s){
+            $urlsefaz = $aU[$i];
+            if (!is_dir($this->pathWsdl.$aA[$i])) {
+                mkdir($this->pathWsdl.$aA[$i], 0777);
+            }
+            $fileName = $this->pathWsdl.$aA[$i].DIRECTORY_SEPARATOR.$aS[$i].'_'.$aM[$i].'.asmx';
+             
+            //inicia comunicação com curl
+            $oCurl = curl_init();
+            curl_setopt($oCurl, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($oCurl, CURLOPT_URL, $urlsefaz.'');
+            curl_setopt($oCurl, CURLOPT_PORT , 443);
+            curl_setopt($oCurl, CURLOPT_VERBOSE, 1);
+            curl_setopt($oCurl, CURLOPT_HEADER, 1); //retorna o cabeçalho de resposta
+            curl_setopt($oCurl, CURLOPT_SSLVERSION, 3);
+            curl_setopt($oCurl, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($oCurl, CURLOPT_SSLCERT, $pubKey);
+            curl_setopt($oCurl, CURLOPT_SSLKEY, $priKey);
+            curl_setopt($oCurl, CURLOPT_RETURNTRANSFER, 1);
+            $__xml = curl_exec($oCurl);
+            $info = curl_getinfo($oCurl);
+            curl_close($oCurl);
+            //verifica se foi retornado o wsdl
+            $n = strpos($__xml,'<wsdl:def');
+            if ($n === false){
+                //não retornou um wsdl
+            } else {
+                $wsdl = trim(substr($__xml, $n));
+                $wsdl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".$wsdl;
+                if (is_file($fileName)) {
+                    unlink($fileName);
+                }
+                file_put_contents($fileName,$wsdl);
+                chmod($fileName, 777);
+            }    
+            $i++;
+        } //fim do processo    
+    }//fim downloadWsdl        
     
 }//fim da classe NatSoap

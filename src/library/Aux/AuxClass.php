@@ -1,15 +1,26 @@
 <?php
-
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * NFePHP (http://www.nfephp.org/)
+ *
+ * @link      http://github.com/nfephp-org/nfephp for the canonical source repository
+ * @copyright Copyright (c) 2008-2013 NFePHP (http://www.nfephp.org)
+ * @license   http://www.gnu.org/licenses/lesser.html LGPL v3
+ * @license   http://www.gnu.org/licenses/gpl.html GNU/GPL v.3
+ * @package   NFePHP
  */
+
 namespace library\Aux;
 
-use library\Exception\NfephpException;
 
+/**
+ * 
+ */
 class AuxClass
 {
+ 
+    public $errMsg = '';
+    public $errStatus = false;
+ 
     
     /**
      * listDir
@@ -21,7 +32,7 @@ class AuxClass
      * @param boolean $retpath se true retorna o path completo dos arquivos se false so retorna o nome dos arquivos
      * @return mixed Matriz com os nome dos arquivos que atendem ao critério estabelecido ou false
      */
-    public function listDir($dir = '', $fileMatch = '', $retpath = false)
+    public static function listDir($dir = '', $fileMatch = '', $retpath = false)
     {
         
         if (trim($fileMatch) != '' && trim($dir) != '') {
@@ -76,8 +87,6 @@ class AuxClass
         return $aName;
     } //fim listDir
 
-    
-    
     /**
      * gunzip2 
      * Descompacta strings GZIP usando arquivo temporário
@@ -87,7 +96,7 @@ class AuxClass
      * @return string xml descompactado
      * @throws Exception
      */
-    private function gunzip2($data)
+    public static function gunzip2($data)
     {
         //cria um nome para o arquivo temporario
         do {
@@ -125,7 +134,7 @@ class AuxClass
      * @param string $data Dados compactados com gzip
      * @return mixed 
      */
-    private function gunzip1($data)
+    public static function gunzip1($data)
     {
         $len = strlen($data);
         if ($len < 18 || strcmp(substr($data, 0, 2), "\x1f\x8b")) {
@@ -266,7 +275,7 @@ class AuxClass
      * @param    string   $DH
      * @return   timestamp
      */
-    protected function convertTime($DH)
+    public static function convertTime($DH)
     {
         if ($DH) {
             $aDH = explode('T', $DH);
@@ -285,7 +294,7 @@ class AuxClass
      * @param string $cnt certificado
      * @return string certificado reformatado 
      */
-    private function splitLines($cnt = '')
+    public static function splitLines($cnt = '')
     {
         if ($cnt != '') {
             $cnt = rtrim(chunk_split(str_replace(array("\r", "\n"), '', $cnt), 76, "\n"));
@@ -301,7 +310,7 @@ class AuxClass
      * @name cleanString
      * @return  string Texto sem caractere especiais
      */
-    private function cleanString($texto)
+    public static function cleanString($texto)
     {
         $aFind = array('&','á','à','ã','â','é','ê','í','ó','ô','õ','ú','ü','ç','Á','À','Ã','Â','É','Ê','Í','Ó','Ô','Õ','Ú','Ü','Ç');
         $aSubs = array('e','a','a','a','a','e','e','i','o','o','o','u','u','c','A','A','A','A','E','E','I','O','O','O','U','U','C');
@@ -318,13 +327,9 @@ class AuxClass
      * @param   string $msg Descrição do erro
      * @return  none
      */
-    private function setError($msg)
+    public static function setError($msg)
     {
-        $this->errMsg .= "$msg\n";
-        $this->errStatus = true;
+        self::$errMsg .= "$msg\n";
+        self::$errStatus = true;
     }//fim setError
-
-        
-    
-}
-?>
+}//fim da classe AuxClass

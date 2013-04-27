@@ -91,7 +91,7 @@ class Pkcs12Certs
             $this->keyPass = $keyPass;
             $this->cnpj = $cnpj;
             
-            $this->loadCerts($testaVal);
+            //$this->loadCerts($testaVal);
             
         } catch (NfephpException $e) {
             throw $e;
@@ -119,7 +119,7 @@ class Pkcs12Certs
      *     CNPJ_priKEY.pem
      *     CNPJ_pubKEY.pem
      *     CNPJ_certKEY.pem
-     *  Estes arquivos tanbém serão carregados nas variáveis da classe
+     *  Estes arquivos também serão carregados nas variáveis da classe
      *  $this->priKEY (com o caminho completo para o arquivo CNPJ_priKEY.pem)
      *  $this->pubKEY (com o caminho completo para o arquivo CNPJ_pubKEY.pem)
      *  $this->certKEY (com o caminho completo para o arquivo CNPJ_certKEY.pem)
@@ -128,7 +128,7 @@ class Pkcs12Certs
      * @param	boolean $testaVal True testa a validade do certificado ou false não testa
      * @return	boolean true se o certificado foi carregado e false se não
      */
-    protected function loadCerts($testaVal = true)
+    public function loadCerts($testaVal = true)
     {
         try {
             if (!function_exists('openssl_pkcs12_read')) {

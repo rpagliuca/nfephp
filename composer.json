@@ -30,6 +30,10 @@
     ],
     "require": {
         "php": ">=5.3.0",
+        "ext-dom": "*",
+        "ext-xml": "*",
+        "ext-libxml": "*",
+        "ext-xmlreader": "*",
         "ext-curl": "*",
         "ext-soap": "*",
         "ext-gd": "*",
@@ -37,12 +41,14 @@
         "ext-openssl": "*",
         "ext-zip": "*",
         "ext-zlib": "*",
-        "apigen/apigen": ">=2.8.0"
+        "apigen/apigen": ">=2.8.0",
+        "openlss/lib-array2xml": "dev-master"
     },
     "autoload": {
         "psr-0": {
             "NFePHP": "src/",
-            "library": "src/"
+            "library": "src/"        
+            
         }
     }
 }

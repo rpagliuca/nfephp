@@ -9,10 +9,11 @@ namespace library\Xml;
 
 use library\Exception\NfephpException;
 
-
 class XmlValidate
 {
-        
+    
+    public $aError = array();
+    
     /**
      * validXML
      * Verifica o xml com base no xsd
@@ -40,8 +41,7 @@ class XmlValidate
             libxml_clear_errors();
             //verifica se foi passado o xml
             if (strlen($xml)==0) {
-                $msg = 'Você deve passar o conteudo do xml assinado como parâmetro ou o caminho completo até o arquivo.';
-                $aError[] = $msg;
+                $msg = 'Você deve passar o conteudo do xml como parâmetro ou o caminho completo até o arquivo.';
                 throw new NfephpException($msg);
             }
             // instancia novo objeto DOM
@@ -58,84 +58,8 @@ class XmlValidate
             $errors = libxml_get_errors();
             if (!empty($errors)) {
                 //o dado passado como $docXml não é um xml
-                $msg = 'O dado informado não é um XML ou não foi encontrado. Você deve passar o conteudo de um arquivo xml assinado como parâmetro.';
-                $aError[] = $msg;
+                $msg = 'O dado informado não é um XML ou não foi encontrado.';
                 throw new NfephpException($msg);
-            }
-            if ($xsdFile=='') {
-                if (is_file($xml)) {
-                    $contents = file_get_contents($xml);
-                } else {
-                    $contents = $xml;
-                }
-                $sxml = simplexml_load_string($contents);
-                $nome = $sxml->getName();
-                $sxml = null;
-                //determinar qual o arquivo de schema válido
-                //buscar o nome do schema
-                switch ($nome){
-                    case 'evento':
-                        //obtem o node com a versão
-                        $node = $dom->$dom->documentElement;
-                        //obtem a versão do layout
-                        $ver = trim($node->getAttribute("versao"));
-                        $tpEvento = $node->getElementsByTagName('tpEvento')->item(0)->nodeValue;
-                        switch ($tpEvento){
-                            case '110110':
-                                //carta de correção
-                                $xsdFile = "CCe_v$ver.xsd";
-                                break;
-                            default:
-                                $xsdFile = "";
-                                break;
-                        }
-                        break;
-                    case 'envEvento':
-                        //obtem o node com a versão
-                        $node = $dom->getElementsByTagName('evento')->item(0);
-                        //obtem a versão do layout
-                        $ver = trim($node->getAttribute("versao"));
-                        $tpEvento = $node->getElementsByTagName('tpEvento')->item(0)->nodeValue;
-                        switch ($tpEvento){
-                            case '110110':
-                                //carta de correção
-                                $xsdFile = "envCCe_v$ver.xsd";
-                                break;
-                            default:
-                                $xsdFile = "envEvento_v$ver.xsd";
-                                break;
-                        }
-                        break;
-                    case 'NFe':
-                        //obtem o node com a versão
-                        $node = $dom->getElementsByTagName('infNFe')->item(0);
-                        //obtem a versão do layout
-                        $ver = trim($node->getAttribute("versao"));
-                        $xsdFile = "nfe_v$ver.xsd";
-                        break;
-                    case 'nfeProc':
-                        //obtem o node com a versão
-                        $node = $dom->documentElement;
-                        //obtem a versão do layout
-                        $ver = trim($node->getAttribute("versao"));
-                        $xsdFile = "procNFe_v$ver.xsd";
-                        break;
-                    default:
-                        //obtem o node com a versão
-                        $node = $dom->documentElement;
-                        //obtem a versão do layout
-                        $ver = trim($node->getAttribute("versao"));
-                        $xsdFile = $nome."_v".$ver.".xsd";
-                        break;
-                }
-                $aFile = $this->listDir($this->xsdDir . $this->schemeVer. DIRECTORY_SEPARATOR, $xsdFile, true);
-                if (!$aFile[0]) {
-                    $msg = "Erro na localização do schema xsd.\n";
-                    $aError[] = $msg;
-                    throw new NfephpException($msg);
-                } else {
-                    $xsdFile = $aFile[0];
-                }
             }
             //limpa erros anteriores
             libxml_clear_errors();
@@ -217,12 +141,11 @@ class XmlValidate
                 throw new NfephpException($msg);
             }
         } catch (NfephpException $e) {
-            $this->setError($e->getMessage());
+            $this->aError[] = $e->getMessage();
+            $aError[] = $e->getMessage();
             throw $e;
             return false;
         }
         return true;
     } //fim validXML
-
-}
-?>
+}//fim da classe xmlValidate

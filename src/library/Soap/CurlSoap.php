@@ -14,12 +14,63 @@ class CurlSoap
 
     public $soapDebug;
     public $soapTimeout = 10;
+    public $soapDebug = '';
+    public $aError = array();
     
-    public function __contruct()
+    private $pubKEY;
+    private $priKEY;
+    
+    private $proxyIP = '';
+    private $proxyPORT = '';
+    private $proxyUSER = '';
+    private $proxyPASS = '';
+    
+    public function __construct($privateKey = '', $publicKey = '', $timeout = 10)
     {
-        
+        try {
+            if ($privateKey == '' || $publicKey == '') {
+                $msg = 'O path para as chaves deve ser passado na instânciação da classe.';
+                throw new NfephpException($msg);
+            }
+            $this->priKEY = $privateKey;
+            $this->pubKEY = $publicKey;
+            $this->soapTimeout = $timeout;
+            
+        } catch (NfephpException $e) {
+            $this->aError[] = $e->getMessage();
+            throw $e;
+            return false;
+        }
     }
     
+    /**
+     * setProxy
+     * @param type $ip
+     * @param type $port
+     * @param type $user
+     * @param type $pass
+     * @return boolean
+     * @throws \library\Exception\NfephpException
+     * @throws NfephpException
+     */
+    public function setProxy($ip = '', $port = '', $user = '', $pass = '')
+    {
+        try {
+
+            if ($ip != '' && $port == '') {
+                $msg = 'Para setar o proxy é necessário indicar a porta.';
+                throw new NfephpException($msg);
+            }
+            $this->proxyIP = $ip;
+            $this->proxyPORT = $port;
+            $this->proxyUSER = $user;
+            $this->proxyPASS = $pass;
+        } catch (NfephpException $e) {
+            $this->aError[] = $e->getMessage();
+            throw $e;
+            return false;
+        }
+    }//fim setProxy
     
     /**
      * send
@@ -28,16 +79,17 @@ class CurlSoap
      * Conforme Manual de Integração Versão 4.0.1 Utilizando cURL e não o SOAP nativo
      *
      * @name send
-     * @param string $urlsefaz
-     * @param string $namespace
-     * @param string $cabecalho
-     * @param string $dados
-     * @param string $metodo
-     * @param numeric $ambiente
-     * @param string $UF sem uso mantido apenas para compatibilidade com nfeSOAP
-     * @return mixed false se houve falha ou o retorno em xml do SEFAZ
+     * @param type $urlsefaz
+     * @param type $namespace
+     * @param type $cabecalho
+     * @param type $dados
+     * @param type $metodo
+     * @param type $ambiente
+     * @return boolean|string
+     * @throws \library\Exception\NfephpException
+     * @throws NfephpException
      */
-    public function send($urlsefaz = '', $namespace = '', $cabecalho = '', $dados = '', $metodo = '', $ambiente = '', $UF = '')
+    public function send($urlsefaz = '', $namespace = '', $cabecalho = '', $dados = '', $metodo = '', $ambiente = '')
     {
         try {
             if ($urlsefaz == '') {
@@ -57,6 +109,7 @@ class CurlSoap
             $data .= $dados;
             $data .= '</soap12:Body>';
             $data .= '</soap12:Envelope>';
+     
             //[Informational 1xx]
             $cCode['100']="Continue";
             $cCode['101']="Switching Protocols";
@@ -103,17 +156,23 @@ class CurlSoap
             $cCode['503']="Service Unavailable";
             $cCode['504']="Gateway Timeout";
             $cCode['505']="HTTP Version Not Supported";
-
+            
+            //tamanho da mensagem
             $tamanho = strlen($data);
+            //estabelecimento dos parametros da mensagem
             $parametros = Array('Content-Type: application/soap+xml;charset=utf-8;action="'.$namespace."/".$metodo.'"','SOAPAction: "'.$metodo.'"',"Content-length: $tamanho");
             $_aspa = '"';
+            
+            //incializa cURL
             $oCurl = curl_init();
-            if (is_array($this->aProxy)) {
+            
+            //setting da seção soap
+            if ($this->proxyIP != '') {
                 curl_setopt($oCurl, CURLOPT_HTTPPROXYTUNNEL, 1);
                 curl_setopt($oCurl, CURLOPT_PROXYTYPE, "CURLPROXY_HTTP");
-                curl_setopt($oCurl, CURLOPT_PROXY, $this->aProxy['IP'].':'.$this->aProxy['PORT']);
-                if ($this->aProxy['PASS'] != '') {
-                    curl_setopt($oCurl, CURLOPT_PROXYUSERPWD, $this->aProxy['USER'].':'.$this->aProxy['PASS']);
+                curl_setopt($oCurl, CURLOPT_PROXY, $this->proxyIP.':'.$this->proxyPORT);
+                if ($this->proxyPASS != '') {
+                    curl_setopt($oCurl, CURLOPT_PROXYUSERPWD, $this->proxyUSER.':'.$this->proxyPASS);
                     curl_setopt($oCurl, CURLOPT_PROXYAUTH, "CURLAUTH_BASIC");
                 } //fim if senha proxy
             }//fim if aProxy
@@ -131,8 +190,12 @@ class CurlSoap
             curl_setopt($oCurl, CURLOPT_POSTFIELDS, $data);
             curl_setopt($oCurl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($oCurl, CURLOPT_HTTPHEADER, $parametros);
+            
+            //inicia a conexão
             $xml = curl_exec($oCurl);
-            $info = curl_getinfo($oCurl); //informações da conexão
+            //obtem as informações da conexão
+            $info = curl_getinfo($oCurl);
+            //coloca as informações em uma variável
             $txtInfo ="";
             $txtInfo .= "URL=$info[url]\n";
             $txtInfo .= "Content type=$info[content_type]\n";
@@ -155,32 +218,41 @@ class CurlSoap
             $txtInfo .= "Start Transfer Time=$info[starttransfer_time]\n";
             $txtInfo .= "Redirect Time=$info[redirect_time]\n";
             $txtInfo .= "Certinfo=$info[certinfo]\n";
+            //obtem o tamanho do xml
             $n = strlen($xml);
+            //localiza a primeira marca de tag
             $x = stripos($xml, "<");
+            //se não exixtir não é um xml
             if ($x !== false) {
                 $xml = substr($xml, $x, $n-$x);
             } else {
                 $xml = '';
             }
+            //carrega a variavel debug
             $this->soapDebug = $data."\n\n".$txtInfo."\n".$xml;
+            //testa se um xml foi retornado
             if ($xml === false || $x === false) {
                 //não houve retorno
                 $msg = curl_error($oCurl) . $info['http_code'] . $cCode[$info['http_code']];
                 throw new NfephpException($msg);
             } else {
                 //houve retorno mas ainda pode ser uma mensagem de erro do webservice
-                if ($info['http_code'] > 300) {
+                if ($info['http_code'] > 200) {
                     $msg = $info['http_code'] . $cCode[$info['http_code']];
-                    //$this->setError($msg);
+                    throw new NfephpException($msg);
                 }
             }
-            curl_close($oCurl);
-            return $xml;
+            
         } catch (NfephpException $e) {
-            //$this->setError($e->getMessage());
+            $aError[] = $e->getMessage();
             throw $e;
+            //fecha a conexão
+            curl_close($oCurl);
             return false;
         }
+        //fecha a conexão
+        curl_close($oCurl);
+        //retorna o xml
+        return $xml;
     } //fim curlSOAP
-
 }//fim da classe CurlSoap

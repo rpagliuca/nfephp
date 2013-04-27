@@ -6,4 +6,6 @@ vendor
 composer.lock
 *.pfx
 *.pem
+config.php
+local
 

@@ -21,10 +21,10 @@ namespace library\Soap;
  *
  * @version 1.0.4
  * @package NFePHP
- * @name NfephpSoapClient
+ * @name CorrectSoapClient
  *
  */
-class NfephpSoapClient extends SoapClient
+class CorrectedSoapClient extends SoapClient
 {
     
     public function __doRequest($request, $location, $action, $version, $one_way = 0)

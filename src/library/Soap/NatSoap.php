@@ -7,11 +7,47 @@
 
 namespace library\Soap;
 
-use library\Soap\NfephpSoapClient;
+use library\Soap\CorrectedSoapClient;
 use library\Exception\NfephpException;
 
-class NatSoap{
+class NatSoap
+{
 
+    public $soapDebug = '';
+    public $soapTimeout = 10;
+    public $soapDebug = '';
+    public $aError = array();
+    public $pathWsdl = '';
+   
+    private $certKEY;
+    private $proxyIP = '';
+    private $proxyPORT = '';
+    private $proxyUSER = '';
+    private $proxyPASS = '';
+    
+    public function __construct($certKey = '', $pathWsdl = '', $timeout = 10)
+    {
+        try {
+            if ($certKey == '') {
+                $msg = 'O path para as chaves deve ser passado na instânciação da classe.';
+                throw new NfephpException($msg);
+            }
+            if ($pathWsdl == '') {
+                $msg = 'O path para os arquivos WSDL deve ser passado na instânciação da classe.';
+                throw new NfephpException($msg);
+            }
+            
+            $this->certKEY = $certKey;
+            $this->pathWsdl = $patWsdl;
+            $this->soapTimeout = $timeout;
+            
+        } catch (NfephpException $e) {
+            $this->aError[] = $e->getMessage();
+            throw $e;
+            return false;
+        }
+    }//fim __construct
+    
     /**
      * send
      * Estabelece comunicaçao com servidor SOAP 1.1 ou 1.2 da SEFAZ,
@@ -70,7 +106,7 @@ class NatSoap{
             }
             //para os estados de AM, MT e PR é necessário usar wsdl baixado para acesso ao webservice
             if ($UF=='AM' || $UF=='MT' || $UF=='PR') {
-                $urlsefaz = "$this->URLbase/wsdl/2.00/$ambiente/$UF$usef";
+                $urlsefaz = "$this->pathWsdl/$ambiente/$UF$usef";
             }
             if ($this->enableSVAN) {
                 //se for SVAN montar o URL baseado no metodo e ambiente
@@ -104,7 +140,7 @@ class NatSoap{
                 'cache_wsdl'    => WSDL_CACHE_NONE
             );
             //instancia a classe soap
-            $oSoapClient = new NfeSoapClient($URL, $options);
+            $oSoapClient = new CorrectedSoapClient($URL, $options);
             //monta o cabeçalho da mensagem
             $varCabec = new SoapVar($cabecalho, XSD_ANYXML);
             $header = new SoapHeader($namespace, 'nfeCabecMsg', $varCabec);

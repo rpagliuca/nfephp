@@ -12,7 +12,7 @@ use library\Exception\NfephpException;
 class CurlSoap
 {
 
-    public $soapDebug;
+    public $soapDebug = '';
     public $soapTimeout = 10;
     public $soapDebug = '';
     public $aError = array();
@@ -41,7 +41,7 @@ class CurlSoap
             throw $e;
             return false;
         }
-    }
+    }//fim __construct
     
     /**
      * setProxy

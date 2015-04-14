@@ -287,28 +287,28 @@ UF/ambiente.
   <UF>
     <sigla>SP</sigla>
     <homologacao>
-      <NfeAutorizacao method="nfeAutorizacaoLote" operation="NfeAutorizacao" version="3.10"></NfeAutorizacao>
+        <NfeAutorizacao method="nfeAutorizacaoLote" operation="NfeAutorizacao" version="3.10">https://homologacao.nfce.fazenda.sp.gov.br/ws/nfeautorizacao.asmx</NfeAutorizacao>
       <NfeConsultaCadastro method="consultaCadastro2" operation="NfeConsultaCadastro" version="3.10"></NfeConsultaCadastro>
       <NfeConsultaDest method="nfeConsultaNFDest" operation="NfeConsultaDest" version="3.10"></NfeConsultaDest>
-      <NfeConsultaProtocolo method="nfeConsultaNF2" operation="NfeConsulta2" version="3.10"></NfeConsultaProtocolo>
-      <NfeConsultaQR method="QR-CODE" operation="NfeConsultaQR" version="3.10"></NfeConsultaQR>      
+      <NfeConsultaProtocolo method="nfeConsultaNF2" operation="NfeConsulta2" version="3.10">https://homologacao.nfce.fazenda.sp.gov.br/ws/nfeconsulta2.asmx</NfeConsultaProtocolo>
+      <NfeConsultaQR method="QR-CODE" operation="NfeConsultaQR" version="3.10">https://www.homologacao.nfce.fazenda.sp.gov.br/NFCeConsultaPublica/Paginas/ConsultaQRCode.aspx</NfeConsultaQR>      
       <NfeDownloadNF method="nfeDownloadNF" operation="NfeDownloadNF" version="3.10"></NfeDownloadNF>
-      <NfeInutilizacao method="nfeInutilizacaoNF2" operation="NfeInutilizacao2" version="3.10"></NfeInutilizacao>
-      <NfeRetAutorizacao method="nfeRetAutorizacaoLote" operation="NfeRetAutorizacao" version="3.10"></NfeRetAutorizacao>
-      <NfeStatusServico method="nfeStatusServicoNF2" operation="NfeStatusServico2" version="3.10"></NfeStatusServico>
-      <RecepcaoEvento method="nfeRecepcaoEvento" operation="RecepcaoEvento" version="1.00"></RecepcaoEvento>
+      <NfeInutilizacao method="nfeInutilizacaoNF2" operation="NfeInutilizacao2" version="3.10">https://homologacao.nfce.fazenda.sp.gov.br/ws/nfeinutilizacao2.asmx</NfeInutilizacao>
+      <NfeRetAutorizacao method="nfeRetAutorizacaoLote" operation="NfeRetAutorizacao" version="3.10">https://homologacao.nfce.fazenda.sp.gov.br/ws/nferetautorizacao.asmx</NfeRetAutorizacao>
+      <NfeStatusServico method="nfeStatusServicoNF2" operation="NfeStatusServico2" version="3.10">https://homologacao.nfce.fazenda.sp.gov.br/ws/nfestatusservico2.asmx</NfeStatusServico>
+      <RecepcaoEvento method="nfeRecepcaoEvento" operation="RecepcaoEvento" version="1.00">https://homologacao.nfce.fazenda.sp.gov.br/ws/recepcaoevento.asmx</RecepcaoEvento>
     </homologacao>
     <producao>
-      <NfeAutorizacao method="nfeAutorizacaoLote" operation="NfeAutorizacao" version="3.10"></NfeAutorizacao>
+        <NfeAutorizacao method="nfeAutorizacaoLote" operation="NfeAutorizacao" version="3.10">https://nfce.fazenda.sp.gov.br/ws/nfeautorizacao.asmx</NfeAutorizacao>
       <NfeConsultaCadastro method="consultaCadastro2" operation="NfeConsultaCadastro" version="3.10"></NfeConsultaCadastro>
       <NfeConsultaDest method="nfeConsultaNFDest" operation="NfeConsultaDest" version="3.10"></NfeConsultaDest>
-      <NfeConsultaProtocolo method="nfeConsultaNF2" operation="NfeConsulta2" version="3.10"></NfeConsultaProtocolo>
-      <NfeConsultaQR method="QR-CODE" operation="NfeConsultaQR" version="3.10"></NfeConsultaQR>      
+      <NfeConsultaProtocolo method="nfeConsultaNF2" operation="NfeConsulta2" version="3.10">https://nfce.fazenda.sp.gov.br/ws/nfeconsulta2.asmx</NfeConsultaProtocolo>
+      <NfeConsultaQR method="QR-CODE" operation="NfeConsultaQR" version="3.10">https://www.nfce.fazenda.sp.gov.br/NFCeConsultaPublica/Paginas/ConsultaQRCode.aspx</NfeConsultaQR>      
       <NfeDownloadNF method="nfeDownloadNF" operation="NfeDownloadNF" version="3.10"></NfeDownloadNF>
-      <NfeInutilizacao method="nfeInutilizacaoNF2" operation="NfeInutilizacao2" version="3.10"></NfeInutilizacao>
-      <NfeRetAutorizacao method="nfeRetAutorizacaoLote" operation="NfeRetAutorizacao" version="3.10"></NfeRetAutorizacao>
-      <NfeStatusServico method="nfeStatusServicoNF2" operation="NfeStatusServico2" version="3.10"></NfeStatusServico>
-      <RecepcaoEvento method="nfeRecepcaoEvento" operation="RecepcaoEvento" version="1.00"></RecepcaoEvento>
+      <NfeInutilizacao method="nfeInutilizacaoNF2" operation="NfeInutilizacao2" version="3.10">https://nfce.fazenda.sp.gov.br/ws/nfeinutilizacao2.asmx</NfeInutilizacao>
+      <NfeRetAutorizacao method="nfeRetAutorizacaoLote" operation="NfeRetAutorizacao" version="3.10">https://nfce.fazenda.sp.gov.br/ws/nferetautorizacao.asmx</NfeRetAutorizacao>
+      <NfeStatusServico method="nfeStatusServicoNF2" operation="NfeStatusServico2" version="3.10">https://nfce.fazenda.sp.gov.br/ws/nfestatusservico2.asmx</NfeStatusServico>
+      <RecepcaoEvento method="nfeRecepcaoEvento" operation="RecepcaoEvento" version="1.00">https://nfce.fazenda.sp.gov.br/ws/recepcaoevento.asmx</RecepcaoEvento>
     </producao>
   </UF>
   <UF>

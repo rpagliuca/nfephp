@@ -107,7 +107,10 @@ class DanfeNFCeNFePHP extends CommonNFePHP implements DocumentoNFePHP
                 'QR'=>'https://www.sefaz.rs.gov.br/NFCE/NFCE-COM.aspx'),
             '28'=> array(
                 'chave'=>'',
-                'QR'=>'http://www.nfe.se.gov.br/portal/consultarNFCe.jsp')
+                'QR'=>'http://www.nfe.se.gov.br/portal/consultarNFCe.jsp'),
+            '35'=> array(
+                'chave'=>'',
+                'QR'=>'https://www.nfce.fazenda.sp.gov.br/NFCeConsultaPublica/Paginas/ConsultaQRCode.aspx')
         ),
         '2' => array(
             '12'=> array(
@@ -130,7 +133,10 @@ class DanfeNFCeNFePHP extends CommonNFePHP implements DocumentoNFePHP
                 'QR'=>'https://www.sefaz.rs.gov.br/NFCE/NFCE-COM.aspx'),
             '28'=> array(
                 'chave'=>'',
-                'QR'=>'http://www.hom.nfe.se.gov.br/portal/consultarNFCe.jsp')
+                'QR'=>'http://www.hom.nfe.se.gov.br/portal/consultarNFCe.jsp'),
+            '35'=> array(
+                'chave'=>'',
+                'QR'=>'https://www.homologacao.nfce.fazenda.sp.gov.br/NFCeConsultaPublica/Paginas/ConsultaQRCode.aspx')
         ));
 
     /**
@@ -692,7 +698,7 @@ class DanfeNFCeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             if (is_file($this->imgQRCode)) {
                 unlink($this->imgQRCode);
             }
-            $this->mpdf->Output($nome, $destino);
+            return $this->mpdf->Output($nome, $destino);
             
         } else {
             echo $this->html;

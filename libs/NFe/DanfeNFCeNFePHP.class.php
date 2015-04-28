@@ -331,8 +331,6 @@ class DanfeNFCeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         }
         
         //DADOS PARA QRCODE
-        $idToken = '';
-        $Token = '';
         $this->imgQRCode = $this->makeQRCode(
             $chNFe,
             $urlQR,
@@ -342,8 +340,8 @@ class DanfeNFCeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             $vNF,
             $vICMS,
             $digVal,
-            $idToken,
-            $Token
+            $this->idToken,
+            $this->emitToken
         );
 
         //FORMATAÇÃO DOS CAMPOS
@@ -773,10 +771,10 @@ class DanfeNFCeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         if ($cDest != '') {
             $seq .= '&cDest=' . $cDest;
         }
-        $seq .= '&dhEmi=' . strtoupper($dhHex);
+        $seq .= '&dhEmi=' . $dhHex;
         $seq .= '&vNF=' . $vNF;
         $seq .= '&vICMS=' . $vICMS;
-        $seq .= '&digVal=' . strtoupper($digHex);
+        $seq .= '&digVal=' . $digHex;
         $seq .= '&cIdToken=' . $idToken.$Token;
         //o hash code é calculado com o Token incluso
         $hash = sha1($seq);
